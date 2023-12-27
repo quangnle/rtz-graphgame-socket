@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Demo pop up donate</title>
+    <style>
+        body {
+            margin: 0;
+            padding-bottom: 3rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+   
+    <script type="module">
+        import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
+        // const socket = io('wss://message-gifting.techwiz.tech:443')
+        // const socket = io('ws://localhost:5861')
+        const socket = io.connect('ws://localhost:5861',{ query: "tokenClient=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MjY1YjE4YjJlY2RmMTE3NDRhOGMzMiIsIm5hbWUiOiJhZHZlcnRpc2VyMSIsImVtYWlsIjoiYWR2ZXJ0aXNlcjFAZ21haWwuY29tIiwiZmlyc3ROYW1lIjpudWxsLCJsYXN0TmFtZSI6bnVsbCwic3RhdHVzIjoiQWN0aXZlIiwicm9sZSI6IlVzZXIiLCJkaXNjb3JkSWQiOm51bGwsImdvb2dsZUlkIjpudWxsLCJmYWNlYm9va0lkIjpudWxsLCJpYXQiOjE3MDM2Njk3NDgsImV4cCI6MTcwMzY3Njk0OH0.CwfcQP73w1ctSYKMRoH6k1ZxRqK6kvyFqRBNeGxNCao" });
+
+        const button = document.getElementById('jump')
+        button.addEventListener('click', function() {
+            console.log(123123)
+            socket.emit('player-jump-server', { address: '0xD357E0L5HY' })
+        })
+
+        socket.on('connect_error', err => {
+            console.log(123)
+            console.log(err instanceof Error)
+            console.log(err.message)
+        })
+
+        console.log(socket)
+        
+        socket.on('ping', function(msg) {
+            console.log('ping msg', msg)
+        })
+
+        socket.on('events', function(msg) {
+            console.log('events msg', msg)
+        })
+
+        socket.on('player-jump-client', function(msg) {
+            console.log('events msg', msg)
+        })
+    </script>
+
+</head>
+
+<body>
+    <div id="body">
+        <div id="messages"></div>
+        <button id="jump">Jump</button>
+    </div>
+
+</body>
+
+
+</html>
