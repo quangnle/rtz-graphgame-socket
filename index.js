@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const server = require('http').createServer(app)
 const jwt = require('jsonwebtoken')
+const { floorTo2Digits, sleep } = require('./util')
+const { updateRoundEnd } = require('./api')
 
 require('dotenv').config()
 
@@ -12,6 +14,18 @@ app.get('/index', function (req, res) {
 
 app.get('/index2', function (req, res) {
   res.sendFile(__dirname + '/public/show2.html')
+})
+
+app.get('/index3', function (req, res) {
+  res.sendFile(__dirname + '/public/show3.html')
+})
+
+app.get('/index4', function (req, res) {
+  res.sendFile(__dirname + '/public/show4.html')
+})
+
+app.get('/index5', function (req, res) {
+  res.sendFile(__dirname + '/public/show5.html')
 })
 
 const io = require('socket.io')(server, {
@@ -54,7 +68,7 @@ io.use((socket, next) => {
   socket.on('run-round', async (data) => {
     if (socket.isVerifyTokenApi) {
       const { round } = data
-      players = round.members
+      players = round.players
       playersSortAmount = players.sort((a, b) => b.amount - a.amount)
       const totalAmount = playersSortAmount.reduce((prev, cur) => {
         return prev + cur.amount
@@ -85,6 +99,10 @@ io.use((socket, next) => {
       console.log('end')
       console.log('round end!!!!!!')
 
+      // Update round
+      const { _id } = round
+      await updateRoundEnd(_id, { playersJump, totalAmountPlayerJump })
+
       players = []
       playersJump = []
       playersSortAmount = []
@@ -95,38 +113,29 @@ io.use((socket, next) => {
   })
 
   socket.on('player-jump-server', (data) => {
-    console.log(345)
     console.log('socket.userInformation', socket.userInformation)
-    const { address } = data
-
-    const indexPlayer = playersSortAmount.findIndex(
-      (p) => p.address === address
-    )
-    console.log('indexPlayer', indexPlayer)
-
-    if (indexPlayer >= 0) {
-      playersJump.push({
-        ...playersSortAmount[indexPlayer],
-        multiplier: floorTo2Digits(multiplier)
-      })
-      remainingAmount -= playersSortAmount[indexPlayer].amount * multiplier
-      playersSortAmount.splice(indexPlayer, 1)
-      largestAmountPlayer = playersSortAmount[0]?.amount || 0
-      io.emit('player-jump-client', {
-        x: floorTo2Digits(multiplier),
-        p: playersSortAmount[indexPlayer]
-      })
+    if (socket.userInformation) {
+      const { address } = socket.userInformation
+      const indexPlayer = playersSortAmount.findIndex(
+        (p) => p.address === address
+      )
+      if (indexPlayer >= 0) {
+        const playerJump = {
+          ...playersSortAmount[indexPlayer],
+          multiplier: floorTo2Digits(multiplier)
+        }
+        playersJump.push(playerJump)
+        remainingAmount -= playersSortAmount[indexPlayer].amount * multiplier
+        playersSortAmount.splice(indexPlayer, 1)
+        largestAmountPlayer = playersSortAmount[0]?.amount || 0
+        io.emit('player-jump-client', {
+          x: floorTo2Digits(multiplier),
+          p: playerJump
+        })
+      }
     }
   })
 })
-
-const sleep = (ms) => {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-const floorTo2Digits = (num) => {
-  return Number(Math.floor(num * 100) / 100)
-}
 
 server.listen(process.env.PORT, () => {
   console.log(`Socket running on PORT: ${process.env.PORT}`)
