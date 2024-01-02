@@ -1,0 +1,57 @@
+name: GH-CI/CD
+on:
+  push:
+    branches: [ "develop" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{github.event.after}}
+      - name: Check eslint
+        run: |
+          npm install && npm run build
+      - name: Get Commit Message
+        run: |
+          GITHUB_REPO_URL="https://github.com/${{ github.repository }}/"
+          GITHUB_COMMIT_URL="${GITHUB_REPO_URL}commit/"
+          BOT_TOKEN="5736753829:AAE88n5HWh7xWQwzvGG9IgitnFV5xZlvTag"
+          WEBHOOK_URL="https://api.telegram.org/bot{$BOT_TOKEN}/sendMessage"
+          CHAT_ID="-618920347"
+          REPO_NAME="${{ github.event.repository.name }}"
+          GITHUB_BRANCH_COMMITS_URL="${GITHUB_REPO_URL}commits/${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}"
+          GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
+          TIMEZONE_SEVENTH=$(date +%H)
+          NUMBER=$(git rev-list ${{github.event.before}}...${{github.event.after}} --count)
+          git log -n ${NUMBER} --pretty=format:"%h" > logs.txt
+          TELE_TEXTS=""
+          SHA_IDS=""
+          for (( i=1; i<="${NUMBER}"; i++ ))
+          do
+            commit=$(sed "${i}q;d" logs.txt)
+            commit=${commit:0:7}
+            element="$(git show ${commit} --pretty=format:"%h" --no-patch)"
+            echo "ELEMENT: ${element}"
+            SLACK_TEXT="$(git show ${element} --pretty=format:"%h%x09%an%x09%s" --no-patch)"
+            echo "SLACK_TEXT: ${SLACK_TEXT}"
+            REPLACE_TEXT="\n[${element}](${GITHUB_COMMIT_URL}${element})"
+            SLACK_TEXT=$(echo $SLACK_TEXT | sed -e "s@$element@$REPLACE_TEXT@g")
+            TELE_TEXTS="${TELE_TEXTS}${SLACK_TEXT}"
+          done
+          echo "${TELE_TEXTS}"
+          TELE_HEADER="[${REPO_NAME}](${GITHUB_REPO_URL}) [${GIT_BRANCH}](${GITHUB_BRANCH_COMMITS_URL})"
+          REPLACEMENT_WITH_MESSAGE="${TELE_HEADER}${TELE_TEXTS}"
+          MESSAGES=$(echo '{"chat_id":"'"${CHAT_ID}"'","text":"'"${REPLACEMENT_WITH_MESSAGE}"'", "parse_mode" : "markdown"}')
+          echo "${MESSAGES}"
+          echo "${TIMEZONE_SEVENTH}"
+          if [ ${TIMEZONE_SEVENTH#0} -gt 23 ] || [ ${TIMEZONE_SEVENTH#0} -lt 16 ]
+          then
+          curl -X POST -H 'Content-type: application/json' --data "${MESSAGES}" ${WEBHOOK_URL}
+          fi
+        continue-on-error: true
+      - name: deploy CD Techwiz
+        run: |
+          curl -X GET https://jenkins.techwiz.tech/job/graphgame-socket.techwiz.tech/build?token=11af23f14f717eb4a26b413de130297e6d
