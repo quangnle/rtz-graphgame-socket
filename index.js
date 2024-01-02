@@ -98,12 +98,6 @@ io.use((socket, next) => {
           return prev + floorTo2Digits(cur.amount * cur.multiplier)
         }, 0)
 
-        console.log('totalAmount', totalAmount)
-        console.log('totalAmountPlayerJump', totalAmountPlayerJump)
-        console.log('playersJump', playersJump)
-        console.log('end')
-        console.log('round end!!!!!!')
-
         // Update round
         const { _id } = round
         await updateRoundEnd(_id, { playersJump, totalAmountPlayerJump })
