@@ -94,6 +94,8 @@ io.use((socket, next) => {
           io.emit('events', { x: floorTo2Digits(multiplier) })
         }
 
+        io.emit('events', 'Round end!!!!!!')
+
         const totalAmountPlayerJump = playersJump.reduce((prev, cur) => {
           return prev + floorTo2Digits(cur.amount * cur.multiplier)
         }, 0)
@@ -102,7 +104,6 @@ io.use((socket, next) => {
         const { _id } = round
         await updateRoundEnd(_id, { playersJump, totalAmountPlayerJump })
 
-        io.emit('events', 'Round end!!!!!!')
         players = []
         playersJump = []
         playersSortAmount = []
@@ -113,7 +114,7 @@ io.use((socket, next) => {
     }
   })
 
-  socket.on('player-jump-server', (data) => {
+  socket.on('player-jump-server', () => {
     console.log('socket.userInformation', socket.userInformation)
     if (socket.userInformation) {
       const { address } = socket.userInformation
