@@ -23,7 +23,7 @@
         // import axios from 'axios';
         // const socket = io('wss://message-gifting.techwiz.tech:443')
         // const socket = io('ws://localhost:5861')
-        const tokenClient = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OGQzNjVjYjVjNWI5NDdjMGUyZjZiZSIsImFkZHJlc3MiOiIweDQ2Yjc4YzkzNmIwMDg1Y2NmODEwMDMxNTMyMmY1M2Y5ZmFjM2IyNjIiLCJub25jZSI6IkNRZWxkQThwWEladSIsImlhdCI6MTcwMzc1NTI3NywiZXhwIjoxNzA0NDc1Mjc3fQ.DYZRwJ0tj_oAJZd3JMPJZaE3RV0zH_KhBHOcLtqoTn8'
+        const tokenClient = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OGQzNmVkZTM5MDMwZDE3YzJmMzA2MyIsImFkZHJlc3MiOiIweDQ2Yjc4YzkzNmIwMDg1Y2NmODEwMDMxNTMyMmY1M2Y5ZmFjM2IyNjQiLCJub25jZSI6IlRoVlRnZEUxOW03dSIsImlhdCI6MTcwMzc1NTMwNCwiZXhwIjoxNzA0NDc1MzA0fQ.XZPBdOnPIxp38lfqkkcS_rwlLvwSchNtGs2ZbKLZZ6c'
         const socket = io.connect('ws://localhost:5861',{ query: `tokenClient=${tokenClient}` });
 
         const button = document.getElementById('jump')
@@ -74,7 +74,7 @@
                 idRound = round._id.toString()
             }
         })
-
+        
         socket.on('events', function(msg) {
             console.log('events msg', msg)
         })
