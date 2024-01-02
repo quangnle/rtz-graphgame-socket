@@ -33,13 +33,13 @@
 
 
         const headers = { 'Authorization': `Bearer ${tokenClient}` }
-        const idRound = '658d3fbc01f19451b7cfaa38'
+        let idRound = null
         const buttonJoin = document.getElementById('join')
         buttonJoin.addEventListener('click', function() {
             const url = `http://localhost:4205/rounds/${idRound}/join`
             axios.patch(url, 
             {
-                amount: 10,
+                amount: 14,
             },
             {
                 headers: headers    
@@ -67,6 +67,14 @@
             console.log('ping msg', msg)
         })
 
+        socket.on('next-round', function(msg) {
+            console.log('next-round msg', msg)
+            const { isStart, round } = msg
+            if (!isStart) {
+                idRound = round._id.toString()
+            }
+        })
+        
         socket.on('events', function(msg) {
             console.log('events msg', msg)
         })
