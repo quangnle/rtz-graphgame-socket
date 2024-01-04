@@ -73,6 +73,12 @@ io.use((socket, next) => {
       } else {
         io.emit('next-round', { isStart, round })
         await sleep(1000)
+        const {
+          multiplierPerLoop,
+          speedPerLoopMS,
+          percentageRandomDrop,
+          maxMultiplier
+        } = data.settings
         players = round.players
         playersSortAmount = players.sort((a, b) => b.amount - a.amount)
         const totalAmount = playersSortAmount.reduce((prev, cur) => {
@@ -86,11 +92,11 @@ io.use((socket, next) => {
 
         while (
           largestAmountPlayer * multiplier <= remainingAmount &&
-          Math.random() >= 0.01 &&
-          multiplier <= 100
+          Math.random() >= percentageRandomDrop / 100 &&
+          multiplier <= maxMultiplier
         ) {
-          await sleep(200)
-          multiplier = multiplier + 0.01
+          await sleep(speedPerLoopMS)
+          multiplier = multiplier + multiplierPerLoop
           io.emit('events', { x: floorTo2Digits(multiplier) })
         }
 
@@ -115,7 +121,6 @@ io.use((socket, next) => {
   })
 
   socket.on('player-jump-server', () => {
-    console.log('socket.userInformation', socket.userInformation)
     if (socket.userInformation) {
       const { address } = socket.userInformation
       const indexPlayer = playersSortAmount.findIndex(

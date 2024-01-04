@@ -36,7 +36,7 @@
         let idRound = null
         const buttonJoin = document.getElementById('join')
         buttonJoin.addEventListener('click', function() {
-            const url = `http://localhost:4205/rounds/${idRound}/join`
+            const url = `http://localhost:4205/rounds/join`
             axios.patch(url, 
             {
                 amount: 14,
