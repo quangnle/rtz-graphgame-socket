@@ -13,7 +13,7 @@ jobs:
           ref: ${{github.event.after}}
       - name: Check eslint
         run: |
-          npm install && npm run build
+          npm install && npm run start
       - name: Get Commit Message
         run: |
           GITHUB_REPO_URL="https://github.com/${{ github.repository }}/"
