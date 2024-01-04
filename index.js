@@ -69,9 +69,17 @@ io.use((socket, next) => {
     if (socket.isVerifyTokenApi) {
       const { isStart, round } = data
       if (!isStart) {
-        io.emit('next-round', { isStart, round })
+        io.emit('next-round', {
+          isStart,
+          round,
+          timestamp: new Date().getTime()
+        })
       } else {
-        io.emit('next-round', { isStart, round })
+        io.emit('next-round', {
+          isStart,
+          round,
+          timestamp: new Date().getTime()
+        })
         await sleep(1000)
         const {
           multiplierPerLoop,
@@ -88,7 +96,10 @@ io.use((socket, next) => {
         remainingAmount = totalAmount
         largestAmountPlayer = playersSortAmount[0]?.amount || 0
 
-        io.emit('events', { x: floorTo2Digits(multiplier) })
+        io.emit('events', {
+          x: floorTo2Digits(multiplier),
+          timestamp: new Date().getTime()
+        })
 
         while (
           largestAmountPlayer * multiplier <= remainingAmount &&
@@ -97,7 +108,10 @@ io.use((socket, next) => {
         ) {
           await sleep(speedPerLoopMS)
           multiplier = multiplier + multiplierPerLoop
-          io.emit('events', { x: floorTo2Digits(multiplier) })
+          io.emit('events', {
+            x: floorTo2Digits(multiplier),
+            timestamp: new Date().getTime()
+          })
         }
 
         io.emit('events', 'Round end!!!!!!')
@@ -139,7 +153,8 @@ io.use((socket, next) => {
         largestAmountPlayer = playersSortAmount[0]?.amount || 0
         io.emit('player-jump-client', {
           x: floorTo2Digits(multiplier),
-          p: playerJump
+          p: playerJump,
+          timestamp: new Date().getTime()
         })
       }
     }
