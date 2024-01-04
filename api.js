@@ -14,21 +14,9 @@ module.exports = {
     })
     while (!response.data.success) {
       await sleep(5000)
-      console.log('response.data', response.data)
       response = await axios.patch(url, body, {
         headers: headers
       })
     }
-    // .then(function (response) {
-    //   // handle success
-    //   const { data } = response
-    //   console.log(data)
-    // })
-    // .catch(function (error) {
-    //   console.log(error.message)
-    // })
-    // .finally(function () {
-    //   console.log('Update round successfully')
-    // })
   }
 }
