@@ -107,9 +107,9 @@ io.use((socket, next) => {
           multiplier <= maxMultiplier
         ) {
           await sleep(speedPerLoopMS)
-          multiplier = multiplier + multiplierPerLoop
+          multiplier = floorTo2Digits(multiplier + multiplierPerLoop)
           io.emit('events', {
-            x: floorTo2Digits(multiplier),
+            x: multiplier,
             timestamp: new Date().getTime()
           })
           // Check player auto stop
@@ -121,12 +121,12 @@ io.use((socket, next) => {
             const player = players[indexPlayer]
             if (
               player.autoStop &&
-              floorTo2Digits(multiplier) === player.autoStop &&
+              multiplier === player.autoStop &&
               largestAmountPlayer * multiplier <= remainingAmount
             ) {
               const playerJump = {
                 ...playersSortAmount[indexPlayer],
-                multiplier: floorTo2Digits(multiplier)
+                multiplier: multiplier
               }
               playersJump.push(playerJump)
               remainingAmount -= floorTo2Digits(
@@ -135,7 +135,7 @@ io.use((socket, next) => {
               playersSortAmount.splice(indexPlayer, 1)
               largestAmountPlayer = playersSortAmount[0]?.amount || 0
               io.emit('player-jump-client', {
-                x: floorTo2Digits(multiplier),
+                x: multiplier,
                 p: playerJump,
                 timestamp: new Date().getTime()
               })
@@ -175,7 +175,7 @@ io.use((socket, next) => {
       ) {
         const playerJump = {
           ...playersSortAmount[indexPlayer],
-          multiplier: floorTo2Digits(multiplier)
+          multiplier: multiplier
         }
         playersJump.push(playerJump)
         remainingAmount -= floorTo2Digits(
@@ -184,7 +184,7 @@ io.use((socket, next) => {
         playersSortAmount.splice(indexPlayer, 1)
         largestAmountPlayer = playersSortAmount[0]?.amount || 0
         io.emit('player-jump-client', {
-          x: floorTo2Digits(multiplier),
+          x: multiplier,
           p: playerJump,
           timestamp: new Date().getTime()
         })

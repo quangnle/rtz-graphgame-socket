@@ -3,6 +3,6 @@ module.exports = {
     return new Promise((resolve) => setTimeout(resolve, ms))
   },
   floorTo2Digits: function (num) {
-    return Number(Math.floor(num * 100) / 100)
+    return Number(num.toFixed(2))
   }
 }
