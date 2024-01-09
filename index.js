@@ -118,6 +118,7 @@ io.use((socket, next) => {
             indexPlayer < players.length;
             indexPlayer++
           ) {
+            const player = players[indexPlayer]
             if (
               player.autoStop &&
               floorTo2Digits(multiplier) === player.autoStop
