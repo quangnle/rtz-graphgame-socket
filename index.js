@@ -112,6 +112,33 @@ io.use((socket, next) => {
             x: floorTo2Digits(multiplier),
             timestamp: new Date().getTime()
           })
+          // Check player auto stop
+          for (
+            let indexPlayer = 0;
+            indexPlayer < players.length;
+            indexPlayer++
+          ) {
+            if (
+              player.autoStop &&
+              floorTo2Digits(multiplier) === player.autoStop
+            ) {
+              const playerJump = {
+                ...playersSortAmount[indexPlayer],
+                multiplier: floorTo2Digits(multiplier)
+              }
+              playersJump.push(playerJump)
+              remainingAmount -= floorTo2Digits(
+                playersSortAmount[indexPlayer].amount * multiplier
+              )
+              playersSortAmount.splice(indexPlayer, 1)
+              largestAmountPlayer = playersSortAmount[0]?.amount || 0
+              io.emit('player-jump-client', {
+                x: floorTo2Digits(multiplier),
+                p: playerJump,
+                timestamp: new Date().getTime()
+              })
+            }
+          }
         }
 
         io.emit('events', 'Round end!!!!!!')
@@ -140,7 +167,10 @@ io.use((socket, next) => {
       const indexPlayer = playersSortAmount.findIndex(
         (p) => p.address === address
       )
-      if (indexPlayer >= 0) {
+      if (
+        indexPlayer >= 0 &&
+        largestAmountPlayer * multiplier <= remainingAmount
+      ) {
         const playerJump = {
           ...playersSortAmount[indexPlayer],
           multiplier: floorTo2Digits(multiplier)
