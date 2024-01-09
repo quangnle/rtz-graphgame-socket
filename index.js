@@ -121,7 +121,8 @@ io.use((socket, next) => {
             const player = players[indexPlayer]
             if (
               player.autoStop &&
-              floorTo2Digits(multiplier) === player.autoStop
+              floorTo2Digits(multiplier) === player.autoStop &&
+              largestAmountPlayer * multiplier <= remainingAmount
             ) {
               const playerJump = {
                 ...playersSortAmount[indexPlayer],
